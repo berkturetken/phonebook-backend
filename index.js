@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const app = express();
 
 app.use(express.json());
@@ -9,6 +10,8 @@ const BODY = "body";
 morgan.token(BODY, (request, response) => JSON.stringify(request.body));
 const customFormat = `:method :url :status :res[content-length] - :response-time ms :${BODY}`;
 app.use(morgan(customFormat));
+
+app.use(cors());
 
 let phonebook = [
   {
