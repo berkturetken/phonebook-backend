@@ -24,11 +24,15 @@ let phonebook = [
     name: "Mary Poppendieck",
     number: "39-23-6423122",
   },
+  {
+    id: 5,
+    name: "Berk Türetken",
+    number: "11-22-333444",
+  },
 ];
 
 // Retrieve all people
 app.get("/api/persons", (request, response) => {
-  console.log("Hey");
   response.json(phonebook);
 });
 
@@ -50,6 +54,14 @@ app.get("/api/persons/:id", (request, response) => {
   } else {
     response.status(404).end();
   }
+});
+
+// Delete a person
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  phonebook = phonebook.filter((p) => p.id !== id);
+
+  response.status(204).end();
 });
 
 const PORT = 3001;
