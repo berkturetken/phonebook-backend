@@ -1,10 +1,14 @@
 const express = require("express");
-const morgan = require('morgan')
+const morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
-app.use(morgan('tiny'));
 
+// Morgan middleware
+const BODY = "body";
+morgan.token(BODY, (request, response) => JSON.stringify(request.body));
+const customFormat = `:method :url :status :res[content-length] - :response-time ms :${BODY}`;
+app.use(morgan(customFormat));
 
 let phonebook = [
   {
