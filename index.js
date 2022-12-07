@@ -73,6 +73,28 @@ generateId = () => {
 // Add a new person
 app.post("/api/persons", (request, response) => {
   const body = request.body;
+  // Error: the name is missing
+  if (!body.name) {
+    return response.status(400).json({
+      error: "name field is missing",
+    });
+  }
+
+  const isPersonExist = phonebook.find((p) => p.name === body.name);
+
+  // Error: The name already exists in the phonebook
+  if (isPersonExist) {
+    return response.status(400).json({
+      error: "name must be unique",
+    });
+  }
+
+  // Error: the number is missing
+  if (!body.number) {
+    return response.status(400).json({
+      error: "phone number field is missing",
+    });
+  }
 
   const person = {
     id: generateId(),
