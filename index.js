@@ -6,10 +6,10 @@ const app = express();
 app.use(express.json());
 
 // Morgan middleware
-const BODY = "body";
-morgan.token(BODY, (request, response) => JSON.stringify(request.body));
-const customFormat = `:method :url :status :res[content-length] - :response-time ms :${BODY}`;
-app.use(morgan(customFormat));
+// const BODY = "body";
+// morgan.token(BODY, (request, response) => JSON.stringify(request.body));
+// const customFormat = `:method :url :status :res[content-length] - :response-time ms :${BODY}`;
+// app.use(morgan(customFormat));
 
 app.use(cors());
 
@@ -117,7 +117,7 @@ app.post("/api/persons", (request, response) => {
   response.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
