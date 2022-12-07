@@ -28,6 +28,7 @@ let phonebook = [
 
 // Retrieve all people
 app.get("/api/persons", (request, response) => {
+  console.log("Hey");
   response.json(phonebook);
 });
 
@@ -38,6 +39,17 @@ app.get("/info", (request, response) => {
   } people</p> <p>${new Date()}</p> `;
 
   response.send(view);
+});
+
+// Retrieve a person
+app.get("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  const person = phonebook.find((p) => p.id === id);
+  if (person) {
+    response.json(person);
+  } else {
+    response.status(404).end();
+  }
 });
 
 const PORT = 3001;
