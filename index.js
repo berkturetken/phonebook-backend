@@ -19,36 +19,42 @@ app.get("/info", (request, response) => {
 });
 
 // Retrieve all people
-app.get("/api/persons", (request, response) => {
-  Person.find({}).then((persons) => {
-    response.json(persons);
-  });
+app.get("/api/persons", (request, response, next) => {
+  Person.find({})
+    .then((persons) => {
+      response.json(persons);
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
 // Retrieve a person
-app.get("/api/persons/:id", (request, response) => {
-  Person.findById(request.params.id).then((p) => {
-    response.json(p);
-  });
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+    .then((p) => {
+      if (p) {
+        response.json(p);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      next(error);
+    });
 });
 
 // Delete a person
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then((result) => {
       response.status(204).end();
     })
-    .catch((error) => console.log(error));
+    .catch((error) => next(error));
 });
 
-generateId = () => {
-  // Let's create a randomId between 1 and 10000
-  const randomId = Math.floor(Math.random() * 10000) + 1;
-  return randomId;
-};
-
 // Add a new person
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   // Error: the name is missing
   if (!body.name) {
@@ -78,10 +84,26 @@ app.post("/api/persons", (request, response) => {
     number: body.number,
   });
 
-  person.save().then((savedPerson) => {
-    response.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      response.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
+
+// Error handling
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
