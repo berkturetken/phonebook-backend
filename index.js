@@ -34,10 +34,11 @@ app.get("/api/persons/:id", (request, response) => {
 
 // Delete a person
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  phonebook = phonebook.filter((p) => p.id !== id);
-
-  response.status(204).end();
+  Person.findByIdAndRemove(request.params.id)
+    .then((result) => {
+      response.status(204).end();
+    })
+    .catch((error) => console.log(error));
 });
 
 generateId = () => {
