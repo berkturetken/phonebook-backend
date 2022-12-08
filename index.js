@@ -1,51 +1,13 @@
+require("dotenv").config();
+
 const express = require("express");
-const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
+const Person = require("./models/person");
 
 app.use(express.json());
-
-// Morgan middleware
-// const BODY = "body";
-// morgan.token(BODY, (request, response) => JSON.stringify(request.body));
-// const customFormat = `:method :url :status :res[content-length] - :response-time ms :${BODY}`;
-// app.use(morgan(customFormat));
-
 app.use(cors());
 app.use(express.static("build"));
-
-let phonebook = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-  {
-    id: 5,
-    name: "Berk Türetken",
-    number: "11-22-333444",
-  },
-];
-
-// Retrieve all people
-app.get("/api/persons", (request, response) => {
-  response.json(phonebook);
-});
 
 // Return a view page
 app.get("/info", (request, response) => {
@@ -56,15 +18,18 @@ app.get("/info", (request, response) => {
   response.send(view);
 });
 
+// Retrieve all people
+app.get("/api/persons", (request, response) => {
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
+});
+
 // Retrieve a person
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = phonebook.find((p) => p.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Person.findById(request.params.id).then((p) => {
+    response.json(p);
+  });
 });
 
 // Delete a person
