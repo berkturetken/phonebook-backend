@@ -11,8 +11,12 @@ app.use(express.static('build'))
 
 // Return a view page
 app.get('/info', (request, response) => {
-  const view = `<h2>Welcome to the Phonebook Application</h2> <p>${new Date()}</p> `
-  response.send(view)
+  Person.find({}).then((persons) => {
+    const view = `<h2>Phonebook has info for ${
+      persons.length
+    } people</h2> <p>${new Date()}</p> `
+    response.send(view)
+  })
 })
 
 // Retrieve all people
