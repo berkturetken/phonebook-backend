@@ -85,7 +85,9 @@ app.post("/api/persons", (request, response, next) => {
 
   Person.findOne({ name: body.name }).then((result) => {
     if (result) {
-      // TODO: How to call put request here?
+      response
+        .status(400)
+        .json({ error: `${body.name} is already added to phonebook!` });
       console.log("Not implemented yet!");
     } else {
       const person = new Person({
