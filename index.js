@@ -56,14 +56,14 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const isPersonExist = phonebook.find((p) => p.name === body.name);
+  //const isPersonExist = phonebook.find((p) => p.name === body.name);
 
   // Error: The name already exists in the phonebook
-  if (isPersonExist) {
-    return response.status(400).json({
-      error: "name must be unique",
-    });
-  }
+  // if (isPersonExist) {
+  //   return response.status(400).json({
+  //     error: "name must be unique",
+  //   });
+  // }
 
   // Error: the number is missing
   if (!body.number) {
@@ -72,15 +72,14 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  phonebook = phonebook.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT || 8080;
