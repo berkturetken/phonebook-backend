@@ -53,43 +53,54 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
+// Update a person
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body;
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
+    .then((updatedPerson) => {
+      response.json(updatedPerson.toJSON());
+    })
+    .catch((error) => next(error));
+});
+
 // Add a new person
 app.post("/api/persons", (request, response, next) => {
   const body = request.body;
-  // Error: the name is missing
-  if (!body.name) {
+  // Error: the name or phone number is missing
+  if (!body.name || !body.number) {
     return response.status(400).json({
-      error: "name field is missing",
+      error: "name or phone number field is missing",
     });
   }
 
-  //const isPersonExist = phonebook.find((p) => p.name === body.name);
+  Person.findOne({ name: body.name }).then((result) => {
+    if (result) {
+      // TODO: How to call put request here?
+      console.log("Not implemented yet!");
+    } else {
+      const person = new Person({
+        name: body.name,
+        number: body.number,
+      });
 
-  // Error: The name already exists in the phonebook
-  // if (isPersonExist) {
-  //   return response.status(400).json({
-  //     error: "name must be unique",
-  //   });
-  // }
-
-  // Error: the number is missing
-  if (!body.number) {
-    return response.status(400).json({
-      error: "phone number field is missing",
-    });
-  }
-
-  const person = new Person({
-    name: body.name,
-    number: body.number,
+      person
+        .save()
+        .then((savedPerson) => {
+          response.json(savedPerson);
+        })
+        .catch((error) => next(error));
+    }
   });
-
-  person
-    .save()
-    .then((savedPerson) => {
-      response.json(savedPerson);
-    })
-    .catch((error) => next(error));
 });
 
 // Error handling
@@ -98,6 +109,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
